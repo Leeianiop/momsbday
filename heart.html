@@ -2,15 +2,23 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sprite Cycler</title>
+<title>Sprite Cycler with Stars</title>
 <style>
   body {
     background: black;
+    overflow: hidden;
+    margin: 0;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    margin: 0;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
   }
 
   #sprite {
@@ -18,6 +26,8 @@
     user-select: none;
     cursor: pointer;
     animation: pulse 1.2s infinite ease-in-out;
+    position: relative;
+    z-index: 1;
   }
 
   @keyframes pulse {
@@ -29,34 +39,71 @@
 </head>
 
 <body>
-
+<canvas id="stars"></canvas>
 <img id="sprite" src="" alt="sprite">
 
 <script>
-  //--------------------------------------------------------------------
-  // 🔥 IMPORTANT:
-  // Put YOUR GitHub raw folder URL here.
-  // Example:
-  // const BASE = "https://raw.githubusercontent.com/YourName/YourRepo/main/";
-  //--------------------------------------------------------------------
+  // -------------------- Sprite Cycler --------------------
   const BASE = "https://raw.githubusercontent.com/Leeianiop/momsbday/main/";
-
   let frame = 1;
+  const sprite = document.getElementById("sprite");
 
   function updateFrame() {
-    document.getElementById("sprite").src = BASE + frame + ".png";
+    sprite.src = BASE + frame + ".png";
   }
 
-  document.getElementById("sprite").onclick = () => {
+  sprite.onclick = () => {
     frame++;
-    if (frame > 11) frame = 1;
+    if(frame > 11) frame = 1;
     updateFrame();
-  };
+  }
 
-  updateFrame(); // load frame 1
+  updateFrame();
+
+  // -------------------- Star Background --------------------
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  const stars = [];
+  const STAR_COUNT = 150;
+
+  for(let i=0;i<STAR_COUNT;i++){
+    stars.push({
+      x: Math.random()*width,
+      y: Math.random()*height,
+      r: Math.random()*1.5 + 0.5,
+      alpha: Math.random(),
+      delta: Math.random()*0.02 + 0.01
+    });
+  }
+
+  function animateStars(){
+    ctx.clearRect(0,0,width,height);
+    for(let star of stars){
+      star.alpha += star.delta;
+      if(star.alpha > 1 || star.alpha < 0) star.delta *= -1;
+      ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    requestAnimationFrame(animateStars);
+  }
+
+  animateStars();
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
 </script>
-
 </body>
 </html>
+
+
+
 
 
