@@ -1,133 +1,60 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Glitter Heart — Single File</title>
-  <style>
-    /* Page layout */
-    :root{--bg:#0b0210;--heart:#ff3b6b;--heart-dark:#b01f49}
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
-    body{display:grid;place-items:center;background:radial-gradient(1000px 500px at 10% 10%, #141022 0%, rgba(11,2,16,1) 30%, var(--bg) 100%);padding:40px}
+<meta charset="UTF-8">
+<title>Sprite Cycler</title>
+<style>
+  body {
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
 
-    /* Heart container */
-    .stage{position:relative;width:min(520px,85vw);height:min(520px,85vw);display:grid;place-items:center}
+  #sprite {
+    width: 300px;
+    user-select: none;
+    cursor: pointer;
+    animation: pulse 1.2s infinite ease-in-out;
+  }
 
-    /* Heart shape built with pseudo elements */
-    .heart{
-      position:relative;width:58%;aspect-ratio:1/1;border-radius:50%;transform:rotate(-45deg);
-      background:linear-gradient(180deg,var(--heart) 0%, var(--heart-dark) 100%);
-      box-shadow:0 10px 40px rgba(255,59,107,0.18), inset 0 -10px 30px rgba(0,0,0,0.25);
-      filter:drop-shadow(0 20px 40px rgba(0,0,0,0.5));
-      display:block;overflow:visible
-    }
-    .heart::before, .heart::after{
-      content:"";position:absolute;inset:0;border-radius:50%;background:inherit;transform:translate(-50%,-50%);
-    }
-    .heart::before{left:50%;top:0;}
-    .heart::after{left:0;top:50%;}
-
-    /* Inner glossy shine */
-    .heart::marker{display:none}
-    .heart .shine{position:absolute;left:18%;top:8%;width:58%;height:58%;border-radius:50%;transform:rotate(45deg);background:radial-gradient(closest-side, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.25) 12%, rgba(255,255,255,0.05) 35%, transparent 40%);mix-blend-mode:overlay;opacity:0.9}
-
-    /* Text center (unrotated) */
-    .label{
-      position:absolute;transform:rotate(45deg); /* rotate back so text sits upright */
-      left:50%;top:50%;translate:-50% -50%;width:80%;text-align:center;z-index:5;
-      pointer-events:none
-    }
-
-    /* Glittering text effect */
-    .glitter{
-      font-size:clamp(18px,5.2vw,48px);font-weight:800;letter-spacing:0.02em;line-height:1;color:transparent;
-      background:linear-gradient(90deg,#fff 0%, #ffd700 12%, #ff8fe3 30%, #9be6ff 60%, #fff 100%);
-      background-size:200% 100%;-webkit-background-clip:text;background-clip:text;animation:shimmer 3s linear infinite;
-      text-shadow:0 2px 8px rgba(0,0,0,0.45);
-    }
-    @keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
-
-    /* Small sparkle particles */
-    .sparkle{position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;opacity:0;mix-blend-mode:screen;filter:blur(0.25px)}
-    .sparkle.s1{background:radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,0.9) 10%, rgba(255,200,0,0.6) 30%, rgba(255,140,200,0.15) 60%, transparent 70%)}
-    .sparkle.s2{background:radial-gradient(circle at 30% 30%, #fff, rgba(150,220,255,0.95) 10%, rgba(255,120,180,0.45) 40%, transparent 70%)}
-
-    .sparkle-pop{animation:pop 900ms cubic-bezier(.17,.67,.37,1) forwards}
-    @keyframes pop{0%{transform:scale(.1);opacity:1}70%{opacity:1;transform:scale(1.1)}100%{transform:scale(0.0);opacity:0}}
-
-    /* Accessibility: prefers-reduced-motion */
-    @media (prefers-reduced-motion: reduce){.glitter, .sparkle{animation:none}}
-
-    /* Footer hint */
-    .hint{position:fixed;left:12px;bottom:12px;color:#9aa; font-size:12px}
-  </style>
+  @keyframes pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.07); }
+    100% { transform: scale(1); }
+  }
+</style>
 </head>
+
 <body>
-  <div class="stage" id="stage">
-    <div class="heart" id="heart">
-      <div class="shine"></div>
-    </div>
 
-    <div class="label" aria-hidden="false">
-      <div class="glitter" id="glitterText">YOU ROCK</div>
-    </div>
-  </div>
+<img id="sprite" src="" alt="sprite">
 
-  <div class="hint">Single-file HTML — save as <code>index.html</code> or drop in a GitHub repo and enable Pages.</div>
+<script>
+  //--------------------------------------------------------------------
+  // 🔥 IMPORTANT:
+  // Put YOUR GitHub raw folder URL here.
+  // Example:
+  // const BASE = "https://raw.githubusercontent.com/YourName/YourRepo/main/";
+  //--------------------------------------------------------------------
+  const BASE = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/";
 
-  <script>
-    // Quick JS to spawn sparkles randomly inside the heart area.
-    const heart = document.getElementById('heart');
-    const stage = document.getElementById('stage');
-    const text = document.getElementById('glitterText');
+  let frame = 1;
 
-    // Allow text customization by user via prompt (unobtrusive):
-    // If you want to skip prompt, comment out next two lines.
-    const userLabel = prompt('Enter label text (leave blank for default):','YOU ROCK');
-    if(userLabel!==null && userLabel.trim()!=='') text.textContent = userLabel.trim().toUpperCase();
+  function updateFrame() {
+    document.getElementById("sprite").src = BASE + frame + ".png";
+  }
 
-    function spawnSparkle(){
-      const s = document.createElement('span');
-      s.className = 'sparkle ' + (Math.random() > 0.5 ? 's1' : 's2');
-      // pick a random point inside heart bounding box
-      const rect = heart.getBoundingClientRect();
-      const stageRect = stage.getBoundingClientRect();
-      // random position biased toward center to sit mostly on the heart
-      const rx = rect.left + rect.width * (0.15 + Math.random() * 0.7);
-      const ry = rect.top + rect.height * (0.12 + Math.random() * 0.76);
-      // position relative to stage
-      s.style.left = (rx - stageRect.left) + 'px';
-      s.style.top = (ry - stageRect.top) + 'px';
-      // random size
-      const size = 4 + Math.round(Math.random()*10);
-      s.style.width = s.style.height = size + 'px';
-      stage.appendChild(s);
+  document.getElementById("sprite").onclick = () => {
+    frame++;
+    if (frame > 11) frame = 1;
+    updateFrame();
+  };
 
-      // trigger animation
-      requestAnimationFrame(()=>{ s.classList.add('sparkle-pop') });
-      // cleanup
-      setTimeout(()=> s.remove(), 1000 + Math.random()*600);
-    }
+  updateFrame(); // load frame 1
+</script>
 
-    // Spawn bursts of sparkles, sometimes bigger bursts
-    let running = true;
-    function burst(){
-      if(!running) return;
-      const count = Math.random() < 0.15 ? 12 + Math.floor(Math.random()*12) : 2 + Math.floor(Math.random()*5);
-      for(let i=0;i<count;i++) setTimeout(spawnSparkle, i*30 + Math.random()*120);
-      // schedule next burst
-      setTimeout(burst, 300 + Math.random()*900);
-    }
-    burst();
-
-    // Let user click the heart to toggle sparkles
-    heart.style.cursor = 'pointer';
-    heart.addEventListener('click', ()=>{ running = !running; if(running) burst() });
-
-    // Make sure sparkles reposition after resize (they are ephemeral so nothing to recalc)
-    window.addEventListener('resize', ()=>{});
-  </script>
 </body>
 </html>
-
